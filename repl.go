@@ -9,11 +9,13 @@ import (
 	"github.com/andreasSchauer/pokedexcli/internal/pokeapi"
 )
 
+
 type config struct {
 	pokeapiClient        pokeapi.Client
 	previousLocationsURL *string
 	nextLocationsURL     *string
 }
+
 
 func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)

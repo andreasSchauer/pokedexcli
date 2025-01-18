@@ -5,11 +5,13 @@ import (
 	"os"
 )
 
+
 type cliCommand struct {
 	name        string
 	description string
 	callback    func(*config) error
 }
+
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
@@ -61,6 +63,11 @@ func commandHelp(cfg *config) error {
 
 
 func commandMapf(cfg *config) error {
+	if cfg.nextLocationsURL == nil {
+		fmt.Println("You're already on the last page")
+		fmt.Println()
+	}
+
 	locationsList, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return err
@@ -80,6 +87,11 @@ func commandMapf(cfg *config) error {
 
 
 func commandMapb(cfg *config) error {
+	if cfg.previousLocationsURL == nil {
+		fmt.Println("You're already on the first page")
+		fmt.Println()
+	}
+
 	locationsList, err := cfg.pokeapiClient.ListLocations(cfg.previousLocationsURL)
 	if err != nil {
 		return err

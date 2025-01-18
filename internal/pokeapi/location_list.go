@@ -7,6 +7,18 @@ import (
 	"net/http"
 )
 
+
+type LocationsList struct {
+	Count    int     `json:"count"`
+	Next     *string `json:"next"`
+	Previous *string `json:"previous"`
+	Results  []struct {
+		Name string `json:"name"`
+		URL  string `json:"url"`
+	} `json:"results"`
+}
+
+
 func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 	url := baseURL + "/location-area"
 	if pageURL != nil {
@@ -37,12 +49,4 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 	return locationsList, nil
 }
 
-type LocationsList struct {
-	Count    int     `json:"count"`
-	Next     *string `json:"next"`
-	Previous *string `json:"previous"`
-	Results  []struct {
-		Name string `json:"name"`
-		URL  string `json:"url"`
-	} `json:"results"`
-}
+
