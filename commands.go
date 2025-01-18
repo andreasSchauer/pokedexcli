@@ -3,42 +3,35 @@ package main
 import (
 	"fmt"
 	"os"
-	"github.com/andreasSchauer/pokedexcli/internal/pokeapi"
 )
 
 type cliCommand struct {
-	name			string
-	description		string
-	callback		func(cfg *config) error
+	name        string
+	description string
+	callback    func(*config) error
 }
-
-type config struct {
-	previous		string
-	next			string
-}
-
 
 func getCommands() map[string]cliCommand {
 	return map[string]cliCommand{
-		"exit": {
-			name: 			"exit",
-			description: 	"Exit the Pokedex",
-			callback: 		commandExit,
-		},
 		"help": {
-			name:			"help",
-			description:	"Explanation of all available commands",
-			callback:		commandHelp,
+			name:        "help",
+			description: "Displays a help message",
+			callback:    commandHelp,
 		},
 		"map": {
-			name:			"map",
-			description:	"Shows areas in batches of 20 (moves forward)",
-			callback:		commandMap,
+			name:        "map",
+			description: "Get the next page of locations",
+			callback:    commandMapf,
 		},
 		"mapb": {
-			name:			"mapb",
-			description:	"Shows areas in batches of 20 (moves backward)",
-			callback:		commandMapb,
+			name:        "mapb",
+			description: "Get the previous page of locations",
+			callback:    commandMapb,
+		},
+		"exit": {
+			name:        "exit",
+			description: "Exit the Pokedex",
+			callback:    commandExit,
 		},
 	}
 }
@@ -67,47 +60,39 @@ func commandHelp(cfg *config) error {
 }
 
 
-func commandMap(cfg *config) error {
-	if cfg.next == "" {
-		return fmt.Errorf("reached final page")
-	}
-
-	areaBatch, err := pokeapi.GetAreaBatch(cfg.next)
+func commandMapf(cfg *config) error {
+	locationsList, err := cfg.pokeapiClient.ListLocations(cfg.nextLocationsURL)
 	if err != nil {
 		return err
 	}
 
-	cfg.previous = areaBatch.Previous
-	cfg.next = areaBatch.Next
-	
-	areas := areaBatch.Results
+	cfg.previousLocationsURL = locationsList.Previous
+	cfg.nextLocationsURL = locationsList.Next
 
-	for _, area := range areas {
-		fmt.Println(area.Name)
+	locations := locationsList.Results
+
+	for _, loc := range locations {
+		fmt.Println(loc.Name)
 	}
-	
+
 	return nil
 }
 
 
 func commandMapb(cfg *config) error {
-	if cfg.previous == "" {
-		return fmt.Errorf("reached first page")
-	}
-
-	areaBatch, err := pokeapi.GetAreaBatch(cfg.previous)
+	locationsList, err := cfg.pokeapiClient.ListLocations(cfg.previousLocationsURL)
 	if err != nil {
 		return err
 	}
 
-	cfg.previous = areaBatch.Previous
-	cfg.next = areaBatch.Next
+	cfg.previousLocationsURL = locationsList.Previous
+	cfg.nextLocationsURL = locationsList.Next
 
-	areas := areaBatch.Results
+	locations := locationsList.Results
 
-	for _, area := range areas {
-		fmt.Println(area.Name)
+	for _, loc := range locations {
+		fmt.Println(loc.Name)
 	}
-	
+
 	return nil
 }

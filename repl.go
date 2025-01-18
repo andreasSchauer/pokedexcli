@@ -1,11 +1,19 @@
 package main
 
 import (
-	"fmt"
 	"bufio"
+	"fmt"
 	"os"
 	"strings"
+
+	"github.com/andreasSchauer/pokedexcli/internal/pokeapi"
 )
+
+type config struct {
+	pokeapiClient        pokeapi.Client
+	previousLocationsURL *string
+	nextLocationsURL     *string
+}
 
 func startRepl(cfg *config) {
 	reader := bufio.NewScanner(os.Stdin)
@@ -34,10 +42,8 @@ func startRepl(cfg *config) {
 	}
 }
 
-
 func cleanInput(text string) []string {
 	textLower := strings.ToLower(text)
 	words := strings.Fields(textLower)
 	return words
 }
-
