@@ -20,12 +20,24 @@ func startRepl() {
 		}
 		commandName := words[0]
 
-		fmt.Printf("Your command was: %s\n", commandName)
+		command, exists := getCommands()[commandName]
+		if exists {
+			err := command.callback()
+			if err != nil {
+				fmt.Println(err)
+			}
+			continue
+		}
+
+		fmt.Printf("Command %s is not a valid command.\n", commandName)
+		continue
 	}
 }
+
 
 func cleanInput(text string) []string {
 	textLower := strings.ToLower(text)
 	words := strings.Fields(textLower)
 	return words
 }
+
