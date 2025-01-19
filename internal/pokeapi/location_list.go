@@ -25,6 +25,18 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 		url = *pageURL
 	}
 
+	cachedData, exists := c.cache.Get(url)
+	if exists {
+		locationsList := LocationsList{}
+		err := json.Unmarshal(cachedData, &locationsList)
+		if err != nil {
+			return LocationsList{}, err
+		}
+
+		return locationsList, nil
+	
+	} 
+
 	res, err := http.Get(url)
 	if err != nil {
 		return LocationsList{}, err
@@ -39,6 +51,7 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 	if res.StatusCode > 299 {
 		return LocationsList{}, fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
 	}
+	c.cache.Add(url, body)
 
 	locationsList := LocationsList{}
 	err = json.Unmarshal(body, &locationsList)
