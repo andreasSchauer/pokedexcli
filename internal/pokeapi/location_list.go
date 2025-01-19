@@ -20,13 +20,13 @@ type LocationsList struct {
 
 
 func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
-	url := baseURL + "/location-area"
+	url := baseURL + "/location-area/"
 	if pageURL != nil {
 		url = *pageURL
 	}
 
-	cachedData, exists := c.cache.Get(url)
-	if exists {
+	cachedData, inCache := c.cache.Get(url)
+	if inCache {
 		locationsList := LocationsList{}
 		err := json.Unmarshal(cachedData, &locationsList)
 		if err != nil {
@@ -51,6 +51,7 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 	if res.StatusCode > 299 {
 		return LocationsList{}, fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
 	}
+
 	c.cache.Add(url, body)
 
 	locationsList := LocationsList{}

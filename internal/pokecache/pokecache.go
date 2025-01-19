@@ -39,11 +39,11 @@ func (c *Cache) Add(key string, val []byte) {
 }
 
 
-func (c *Cache) Get(key string) (val []byte, keyExists bool) {
+func (c *Cache) Get(key string) (val []byte, inCache bool) {
 	c.mu.Lock()
 	defer c.mu.Unlock()
 	
-	if entry, exists := c.entries[key]; exists {
+	if entry, inCache := c.entries[key]; inCache {
 		return entry.val, true
 	}
 
