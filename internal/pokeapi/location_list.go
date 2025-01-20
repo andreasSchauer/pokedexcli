@@ -2,7 +2,6 @@ package pokeapi
 
 import (
 	"encoding/json"
-	"fmt"
 	"io"
 	"net/http"
 )
@@ -35,7 +34,7 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 
 		return locationsList, nil
 	
-	} 
+	}
 
 	res, err := http.Get(url)
 	if err != nil {
@@ -47,9 +46,6 @@ func (c *Client) ListLocations(pageURL *string) (LocationsList, error) {
 	body, err := io.ReadAll(res.Body)
 	if err != nil {
 		return LocationsList{}, err
-	}
-	if res.StatusCode > 299 {
-		return LocationsList{}, fmt.Errorf("response failed with status code: %d and\nbody: %s", res.StatusCode, body)
 	}
 
 	c.cache.Add(url, body)

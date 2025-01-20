@@ -3,13 +3,14 @@ package main
 import (
 	"fmt"
 	"os"
+	"errors"
 )
 
 
 type cliCommand struct {
 	name        string
 	description string
-	callback    func(*config) error
+	callback    func(*config, ...string) error
 }
 
 
@@ -30,6 +31,11 @@ func getCommands() map[string]cliCommand {
 			description: "Get the previous page of locations",
 			callback:    commandMapb,
 		},
+		"explore": {
+			name:		 "explore",
+			description: "List all pokemon in a location",
+			callback:    commandExplore,
+		},
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -39,14 +45,14 @@ func getCommands() map[string]cliCommand {
 }
 
 
-func commandExit(cfg *config) error {
+func commandExit(cfg *config, args ...string) error {
 	fmt.Println("Closing the Pokedex... Goodbye!")
 	os.Exit(0)
 	return nil
 }
 
 
-func commandHelp(cfg *config) error {
+func commandHelp(cfg *config, args ...string) error {
 	fmt.Println()
 	fmt.Println("Welcome to the Pokedex!")
 	fmt.Println("Usage:")
@@ -62,7 +68,7 @@ func commandHelp(cfg *config) error {
 }
 
 
-func commandMapf(cfg *config) error {
+func commandMapf(cfg *config, args ...string) error {
 	if cfg.nextLocationsURL == nil {
 		fmt.Println("You're already on the last page")
 		fmt.Println()
@@ -86,7 +92,7 @@ func commandMapf(cfg *config) error {
 }
 
 
-func commandMapb(cfg *config) error {
+func commandMapb(cfg *config, args ...string) error {
 	if cfg.previousLocationsURL == nil {
 		fmt.Println("You're already on the first page")
 		fmt.Println()
@@ -104,6 +110,29 @@ func commandMapb(cfg *config) error {
 
 	for _, loc := range locations {
 		fmt.Println(loc.Name)
+	}
+
+	return nil
+}
+
+
+func commandExplore(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("you must provide a location name")
+	}
+
+	locationName := args[0]
+
+	pokemonList, err := cfg.pokeapiClient.ListPokemon(locationName)
+	if err != nil {
+		return err
+	}
+
+	pokemonEncounters := pokemonList.PokemonEncounters
+	fmt.Println("Found Pokemon:")
+
+	for _, pkmn := range pokemonEncounters {
+		fmt.Printf(" - %s\n", pkmn.Pokemon.Name)
 	}
 
 	return nil
