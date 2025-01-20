@@ -14,6 +14,7 @@ type config struct {
 	pokeapiClient        pokeapi.Client
 	previousLocationsURL *string
 	nextLocationsURL     *string
+	pokedex				 map[string]pokeapi.Pokemon
 }
 
 

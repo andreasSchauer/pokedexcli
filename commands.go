@@ -36,6 +36,11 @@ func getCommands() map[string]cliCommand {
 			description: "List all pokemon in a location",
 			callback:    commandExplore,
 		},
+		"catch": {
+			name:		 "catch",
+			description: "Attempt to catch a pokemon",
+			callback:	 commandCatch,
+		},
 		"exit": {
 			name:        "exit",
 			description: "Exit the Pokedex",
@@ -137,3 +142,27 @@ func commandExplore(cfg *config, args ...string) error {
 
 	return nil
 }
+
+
+func commandCatch(cfg *config, args ...string) error {
+	if len(args) != 1 {
+		return errors.New("you must provide a pokemon name")
+	}
+
+	pokemonName := args[0]
+	pokemon, err := cfg.pokeapiClient.GetPokemon(pokemonName)
+	if err != nil {
+		return err
+	}
+
+	if pokemon.CatchPokemon() {
+		fmt.Printf("%s was caught!\n", pokemon.Name)
+		cfg.pokedex[pokemon.Name] = pokemon
+	} else {
+		fmt.Printf("%s escaped!\n", pokemon.Name)
+	}
+	
+	return nil
+}
+
+

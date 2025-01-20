@@ -13,6 +13,7 @@ func main() {
 	cfg := &config{
 		pokeapiClient: pokeClient,
 		nextLocationsURL: &initNextLocationsURL,
+		pokedex: make(map[string]pokeapi.Pokemon),
 	}
 
 	startRepl(cfg)
